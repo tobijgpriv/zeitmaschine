@@ -22,7 +22,7 @@ def zeitmaschine():
 
 @app.route("/status")
 def status():
-    app.logger.error("Year " + current_target_year)
+    app.logger.error(current_target_year)
     print(current_target_year)
     with year_lock:
         if current_target_year is not None:

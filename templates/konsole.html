@@ -3,7 +3,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Konsole</title>
+  <title>Zeitmaschinen-Konsole</title>
   <style>
     body {
       background: #1a0f0a;
@@ -14,6 +14,7 @@
       align-items: center;
       height: 100vh;
     }
+
     .panel {
       background: #2e1d14;
       padding: 40px;
@@ -21,14 +22,17 @@
       border-radius: 20px;
       box-shadow: 0 0 20px #a67c52;
       text-align: center;
+      width: 400px;
     }
+
     input {
       font-size: 2em;
       padding: 10px;
-      width: 200px;
+      width: 100%;
       text-align: center;
       margin-bottom: 20px;
     }
+
     button {
       font-size: 1.5em;
       background: #d4af37;
@@ -37,35 +41,86 @@
       color: #1a0f0a;
       cursor: pointer;
       border-radius: 8px;
+      margin: 5px;
+    }
+
+    .status {
+      margin-top: 30px;
+      font-size: 1.2em;
+      background-color: #3e2c1e;
+      padding: 10px;
+      border: 2px solid #b08c4f;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
   <div class="panel">
-    <h1>Zieljahr eingeben</h1>
+    <h1>Zeitmaschine steuern</h1>
     <form onsubmit="startTime(event)">
-      <input type="number" name="year" id="yearInput" required min="1000" max="2999">
+      <input type="number" name="year" id="yearInput" required min="1000" max="2999" placeholder="Zieljahr">
       <br>
-      <button type="submit">Zeitreise starten</button>
+      <button type="submit">Start</button>
+      <button type="button" onclick="resetMachine()">Reset</button>
     </form>
+
+    <div class="status" id="statusBox">
+      Lade Status...
+    </div>
   </div>
 
   <script>
+    function updateStatus() {
+      fetch("/status")
+        .then(res => res.json())
+        .then(data => {
+          const box = document.getElementById("statusBox");
+          if (data.start) {
+            box.textContent = `🚀 Aktiv – Zieljahr: ${data.year}`;
+          } else {
+            box.textContent = "🕒 Wartend – Keine Zeitreise aktiv";
+          }
+        })
+        .catch(() => {
+          document.getElementById("statusBox").textContent = "⚠️ Fehler beim Abrufen des Status";
+        });
+    }
+
     function startTime(event) {
       event.preventDefault();
       const year = document.getElementById('yearInput').value;
       fetch("/start", {
         method: "POST",
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
         body: "year=" + encodeURIComponent(year)
       }).then(res => {
         if (res.ok) {
-          alert("Zeitmaschine gestartet!");
+          updateStatus();
+          alert("⏳ Zeitmaschine gestartet");
         } else {
-          alert("Fehler beim Start");
+          alert("⚠️ Fehler beim Start");
         }
       });
     }
+
+    function resetMachine() {
+      fetch("/reset", {
+        method: "POST"
+      }).then(res => {
+        if (res.ok) {
+          updateStatus();
+          alert("🔁 Zeitmaschine zurückgesetzt");
+        } else {
+          alert("⚠️ Fehler beim Zurücksetzen");
+        }
+      });
+    }
+
+    // Initial und dann alle 5 Sekunden aktualisieren
+    updateStatus();
+    setInterval(updateStatus, 2000);
   </script>
 </body>
 </html>

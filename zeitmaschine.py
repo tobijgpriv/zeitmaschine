@@ -80,3 +80,9 @@ def alles_an():
     drehlicht(1)
     drei(1)
     vier(1)
+
+def zeitreise():
+    strob(1)
+    drehlicht(1)
+    drei(1)
+    vier(1)

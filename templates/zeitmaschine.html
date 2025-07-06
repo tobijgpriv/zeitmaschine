@@ -38,13 +38,17 @@
 
     .screen {
       font-size: 12em;
+      font-family: monospace;
       color: #d4af37;
       text-shadow: 0 0 20px #f0c674;
-      font-family: monospace;
-      text-align: left;
       white-space: nowrap;
-      width: 13em; /* <- Platz für 10-11 Zeichen wie "3000 v. Chr." */
-      overflow: hidden;
+    
+      width: 14ch;             /* Platz für max. 14 Zeichen: "3000 v. Chr." */
+      text-align: left;        /* Kein Zentrieren! */
+      display: inline-block;
+    
+      padding-left: calc((100% - 14ch) / 2);  /* Manuelles Zentrieren */
+      box-sizing: content-box;
     }
 
 

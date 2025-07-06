@@ -40,4 +40,4 @@ def strob(state):
 
     turn_switch_wrapper(code,state,1)
 
-strob(0)
+strob(1)

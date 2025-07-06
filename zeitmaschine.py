@@ -37,18 +37,41 @@ def strob(state):
         code = 4433
     else:
         code = 4436
+    protocol = 3
 
-    turn_switch_wrapper(code,1)
+    turn_switch_wrapper(code,protocol)
+
+def drei(state):
+    if state == 1:
+        code = 5201
+    else:
+        code = 5204
+    protocol = 3
+
+    turn_switch_wrapper(code,protocol)
+
+def vier(state):
+    if state == 1:
+        code = 1361
+    else:
+        code = 1364
+    protocol = 3
+
+    turn_switch_wrapper(code,protocol)
 
 def drehlicht(state):
     if state == 1: 
         code=5755988
     else:
         code=5755985
+    
+    protocol = 2
 
-    turn_switch_wrapper(code,2)
+    turn_switch_wrapper(code,protocol)
 
 strob(1)
 drehlicht(0)
+drei(1)
+vier(1)
 
 #test

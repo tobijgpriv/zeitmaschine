@@ -48,7 +48,7 @@ def drehlicht(state):
 
     turn_switch_wrapper(code,2)
 
-strob(0)
-drehlicht(1)
+strob(1)
+drehlicht(0)
 
 #test

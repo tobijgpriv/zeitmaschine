@@ -15,12 +15,15 @@ def zeitmaschine():
     if not year or not year.isdigit():
         return "Ungültige Eingabe", 400
     with year_lock:
+        app.logger.error("Debug")
         current_target_year = int(year)
     return "Zeitreise gestartet", 200
     #return render_template('zeitmaschine.html', target_year=int(year))
 
 @app.route("/status")
 def status():
+    app.logger.error(current_target_year)
+    print(current_target_year)
     with year_lock:
         if current_target_year is not None:
             return jsonify({"start": True, "year": current_target_year})

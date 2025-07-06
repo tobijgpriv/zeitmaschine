@@ -62,7 +62,7 @@
 </head>
 <body>
   <div class="panel">
-    <h1>Zeitmaschine steuern</h1>
+    <h1>Zeitmaschinensteuerung</h1>
     <form onsubmit="startTime(event)">
       <label for="yearInput">Zieljahr:</label>
       <input type="number" name="year" id="yearInput" placeholder="Zieljahr">
@@ -139,7 +139,7 @@
       });
     }
 
-    // Initial und dann alle 5 Sekunden aktualisieren
+    // Initial und dann alle 2 Sekunden aktualisieren
     updateStatus();
     setInterval(updateStatus, 2000);
   </script>

@@ -59,6 +59,8 @@ def index():
 
 @app.route("/stop", methods=["POST"])
 def stop():
+    global current_running
+    current_running = False
     standardbeleuchtung()  
     return jsonify({"status": "ok"})
 

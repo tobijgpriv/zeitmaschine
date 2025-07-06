@@ -37,27 +37,16 @@
     }
 
     .screen {
-      position: relative;
       font-size: 12em;
       color: #d4af37;
       text-shadow: 0 0 20px #f0c674;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-family: monospace;
+      text-align: center;
       white-space: nowrap;
+      width: 12em; /* <- Platz für 10-11 Zeichen wie "3000 v. Chr." */
+      overflow: hidden;
     }
 
-    .screen .ghost {
-      visibility: hidden;
-      pointer-events: none;
-      position: absolute;
-    }
-
-    #yearDisplay {
-      position: relative;
-      z-index: 1;
-    }
 
     .energy-container {
       width: 80%;
@@ -89,10 +78,7 @@
 <body>
   <div class="frame">
     <h1>Chrono-Scanner Interface</h1>
-    <div class="screen">
-    <div class="ghost">3000 v. Chr.</div>
-    <div id="yearDisplay">----</div>
-  </div>
+    <div class="screen" id="yearDisplay">----</div>
     <div class="energy-container">
       <div class="energy-label">Energieanzeige</div>
       <div class="energy-bar" id="energyBar"></div>

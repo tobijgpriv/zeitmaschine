@@ -7,7 +7,7 @@ app = Flask(__name__)
 current_target_year = None
 year_lock = Lock()
 
-@app.route('/zeitmaschine', methods=["POST"])
+@app.route('/start', methods=["POST"])
 def zeitmaschine():
     zeitreise()
     if request.method == 'POST':

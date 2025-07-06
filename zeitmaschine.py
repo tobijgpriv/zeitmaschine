@@ -69,9 +69,18 @@ def drehlicht(state):
 
     turn_switch_wrapper(code,protocol)
 
-strob(1)
-drehlicht(0)
-drei(1)
-vier(1)
+def alles_aus():
+    strob(0)
+    drehlicht(0)
+    drei(0)
+    vier(0)
+
+def alles_an():
+    strob(1)
+    drehlicht(1)
+    drei(1)
+    vier(1)
+
+alles_an()
 
 #test

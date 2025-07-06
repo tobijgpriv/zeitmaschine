@@ -38,6 +38,6 @@ def strob(state):
     else:
         code = 4436
 
-    turn_switch(code,state,1)
+    turn_switch_wrapper(code,state,1)
 
 strob(0)

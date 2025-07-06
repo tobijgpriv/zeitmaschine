@@ -81,6 +81,6 @@ def alles_an():
     drei(1)
     vier(1)
 
-alles_aus() 
+alles_an() 
 
 #test

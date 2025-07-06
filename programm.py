@@ -12,7 +12,7 @@ def zeitmaschine():
     zeitreise()
     if request.method == 'POST':
         year = request.form['year']
-    if not year or not year.isdigit():
+    if not year or not year.lstrip("-").isdigit():
         return "Ungültige Eingabe", 400
     with year_lock:
         app.logger.error("Debug" + year)

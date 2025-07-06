@@ -91,9 +91,17 @@
   const duration = 20000;
   const intervalMs = 100;
 
-  function randomYear(min = 1000, max = 2999) {
+  function randomYear(min = -3000, max = 2999) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
+
+  function formatYear(year) {
+  if (year < 0) {
+    return Math.abs(year) + " v. Chr.";
+  } else {
+    return year.toString();
+  }
+}
 
   function startTimeMachine(year) {
     started = true;
@@ -102,10 +110,10 @@
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
       energyBar.style.width = `${progress * 100}%`;
-      yearDisplay.textContent = randomYear();
+      yearDisplay.textContent = formatYear(randomYear(-3000,2999));
       if (progress >= 1) {
         clearInterval(intervalId);
-        yearDisplay.textContent = year;
+        yearDisplay.textContent = formatYear(year);
         fetch("/stop", { method: "POST" });
         // Weiter beobachten ob reset kommt
       }

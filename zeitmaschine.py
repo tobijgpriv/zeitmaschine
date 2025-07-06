@@ -37,7 +37,7 @@ def strob(state):
         code = 4433
     else:
         code = 4436
-    protocol = 3
+    protocol = 1
 
     turn_switch_wrapper(code,protocol)
 
@@ -46,7 +46,7 @@ def drei(state):
         code = 5201
     else:
         code = 5204
-    protocol = 3
+    protocol = 1
 
     turn_switch_wrapper(code,protocol)
 
@@ -55,7 +55,7 @@ def vier(state):
         code = 1361
     else:
         code = 1364
-    protocol = 3
+    protocol = 1
 
     turn_switch_wrapper(code,protocol)
 

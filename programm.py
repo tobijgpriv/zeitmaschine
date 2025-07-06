@@ -19,7 +19,7 @@ def index():
 @app.route("/stop", methods=["POST"])
 def stop_route():
     standardbeleuchtung()  # <-- Diese Funktion wird am Ende aufgerufen
-    return jsonify({"status": "stopped"})
+    return "stopped"
 
 
 

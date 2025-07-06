@@ -1,7 +1,8 @@
-from zeitmaschine import drei,vier,strob,drehlicht,zeitreise,standardbeleuchtung
+from zeitmaschine import zeitreise,standardbeleuchtung
 from flask import Flask, render_template, request,jsonify
 from threading import Lock
 
+#Start Task runOnPi with Strg+Alt+r
 app = Flask(__name__)
 
 current_target_year = None
@@ -41,6 +42,7 @@ def status():
 
 @app.route("/anzeige")
 def zeitanzeige():
+    standardbeleuchtung()
     return render_template("zeitmaschine.html")      
     
 @app.route("/reset", methods=["POST"])

@@ -38,7 +38,7 @@ def strob(state):
     else:
         code = 4436
 
-    turn_switch_wrapper(code,state,1)
+    turn_switch_wrapper(code,1)
 
 def drehlicht(state):
     if state == 1: 

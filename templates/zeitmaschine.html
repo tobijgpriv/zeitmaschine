@@ -121,7 +121,7 @@
   }
 }
 
-  function startTimeMachine(year) {
+  function startTimeMachine(year,duration) {
     started = true;
     const startTime = Date.now();
     const intervalId = setInterval(() => {
@@ -146,7 +146,8 @@
       if (!started && data.start) {
         // Starte Zeitreise
         targetYear = data.year;
-        startTimeMachine(targetYear);
+        const duration = (data.duration || 20) * 1000;
+        startTimeMachine(targetYear,duration);
       } else if (started && !data.start) {
         // Reset erkannt → Zurücksetzen der Anzeige
         location.reload(); // Volles Zurücksetzen auf standby

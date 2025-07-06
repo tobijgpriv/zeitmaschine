@@ -58,7 +58,8 @@
   <div class="panel">
     <h1>Zeitmaschine steuern</h1>
     <form onsubmit="startTime(event)">
-      <input type="number" name="year" id="yearInput" placeholder="Zieljahr">
+      <input type="number" name="year" id="yearInput" required min="-3000" max="2999" placeholder="Zieljahr">
+      <input type="number" name="duration" id="durationInput" min="5" max="120" value="20" placeholder="Dauer (Sek)">
       <br>
       <button type="submit">Start</button>
       <button type="button" onclick="resetMachine()">Reset</button>
@@ -89,12 +90,17 @@
     function startTime(event) {
       event.preventDefault();
       const year = document.getElementById('yearInput').value;
+      const duration = document.getElementById('durationInput').value;
+
+      const params = new URLSearchParams();
+      params.append("year", year);
+      params.append("duration", duration);
       fetch("/start", {
         method: "POST",
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: "year=" + encodeURIComponent(year)
+        body: params.toString()
       }).then(res => {
         if (res.ok) {
           updateStatus();

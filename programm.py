@@ -1,3 +1,3 @@
 from zeitmaschine import drei,vier,strob,drehlicht
 
-drei(0)
+drei(1)

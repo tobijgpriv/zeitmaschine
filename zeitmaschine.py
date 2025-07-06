@@ -30,4 +30,4 @@ def strob(state,repeat,pulselength,length):
     rfdevice.tx_code(code, protocol, pulselength, length)
     rfdevice.cleanup()
 
-strob(False,repeat,pulselength,24)
+strob(True,repeat,pulselength,24)

@@ -16,6 +16,7 @@ def zeitmaschine():
         return "Ungültige Eingabe", 400
     with year_lock:
         app.logger.error("Debug" + year)
+        global current_target_year 
         current_target_year = int(year)
     return "Zeitreise gestartet", 200
     #return render_template('zeitmaschine.html', target_year=int(year))

@@ -1,15 +1,15 @@
+<!-- templates/zeitmaschine.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Zeitmaschine - Steampunk Interface</title>
+  <title>Zeitmaschine</title>
   <style>
     html, body {
       margin: 0;
-      padding: 0;
       height: 100%;
       background: radial-gradient(#3e2c1e, #1a0f0a);
-      font-family: 'Courier New', Courier, monospace;
+      font-family: monospace;
       color: #f0e6d2;
       display: flex;
       justify-content: center;
@@ -17,33 +17,29 @@
     }
 
     .frame {
-      border: 12px solid #b08c4f;
+      width: 90vw;
+      height: 90vh;
+      border: 10px solid #b08c4f;
       border-radius: 30px;
       padding: 30px;
       background: #1f120b;
-      box-shadow: 0 0 100px #a67c52 inset, 0 0 40px #000;
-      text-align: center;
-      width: 90vw;
-      height: 90vh;
-      box-sizing: border-box;
+      box-shadow: inset 0 0 100px #a67c52;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
+      box-sizing: border-box;
     }
 
     h1 {
       font-size: 2em;
-      color: #f0e6d2;
-      text-shadow: 0 0 5px #a67c52;
-      margin: 20px 0;
+      margin: 0;
     }
 
     .screen {
-      font-size: 18em;
+      font-size: 12em;
       color: #d4af37;
-      text-shadow: 0 0 15px #f0c674, 0 0 40px #a67c52;
-      letter-spacing: 0.1em;
+      text-shadow: 0 0 20px #f0c674;
       flex-grow: 1;
       display: flex;
       align-items: center;
@@ -57,9 +53,8 @@
       border: 3px solid #b08c4f;
       border-radius: 10px;
       overflow: hidden;
-      box-shadow: inset 0 0 10px #000;
-      margin-bottom: 30px;
       position: relative;
+      margin-bottom: 20px;
     }
 
     .energy-bar {
@@ -75,7 +70,6 @@
       left: 0;
       font-size: 1.2em;
       color: #f0e6d2;
-      text-shadow: 0 0 3px #a67c52;
     }
   </style>
 </head>
@@ -92,46 +86,54 @@
   <script>
     const yearDisplay = document.getElementById('yearDisplay');
     const energyBar = document.getElementById('energyBar');
-    const targetYear = {{ target_year }};
-    const displayInterval = 100;
-    const duration = 20000;
-
-    let intervalId;
+    let targetYear = null;
+    let started = false;
+    const duration = 40000;
+    const intervalMs = 100;
 
     function randomYear(min = 1000, max = 2999) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function updateEnergyBar(progress) {
-      energyBar.style.width = `${progress * 100}%`;
-    }
-
     function startTimeMachine() {
       const startTime = Date.now();
-      intervalId = setInterval(() => {
+      const intervalId = setInterval(() => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        updateEnergyBar(progress);
+        energyBar.style.width = `${progress * 100}%`;
         yearDisplay.textContent = randomYear();
         if (progress >= 1) {
           clearInterval(intervalId);
           yearDisplay.textContent = targetYear;
-          fetch("/stop", {
-            method: "POST"
-            }).then(response => {
-              if (response.ok) {
-                console.log("Stop-Signal erfolgreich gesendet");
-              } else {
-                console.error("Fehler beim Stop-Signal");
-              }
-            }).catch(error => {
-            console.error("Netzwerkfehler beim Stop-Signal:", error);
-            });
+
+          fetch("/stop", { method: "POST" });
         }
-      }, displayInterval);
+      }, intervalMs);
     }
 
-    startTimeMachine();
+    async function pollForStart() {
+      const res = await fetch("/status");
+      const data = await res.json();
+      if (data.start && !started) {
+        started = true;
+        targetYear = data.year;
+        location.reload(); // Neuladen, um das Jahr in den Speicher zu holen
+      } else {
+        setTimeout(pollForStart, 1000);
+      }
+    }
+
+    // Wenn Zieljahr beim Laden bekannt, direkt starten
+    fetch("/status")
+      .then(r => r.json())
+      .then(data => {
+        if (data.start) {
+          targetYear = data.year;
+          startTimeMachine();
+        } else {
+          pollForStart();
+        }
+      });
   </script>
 </body>
 </html>

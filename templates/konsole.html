@@ -3,7 +3,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Zeitmaschinen-Konsole</title>
+  <title>Konsole</title>
   <style>
     body {
       background: #1a0f0a;
@@ -43,11 +43,29 @@
 <body>
   <div class="panel">
     <h1>Zieljahr eingeben</h1>
-    <form action="/zeitmaschine" method="post">
-      <input type="number" name="year" placeholder="z. B. 1889">
+    <form onsubmit="startTime(event)">
+      <input type="number" name="year" id="yearInput" required min="1000" max="2999">
       <br>
       <button type="submit">Zeitreise starten</button>
     </form>
   </div>
+
+  <script>
+    function startTime(event) {
+      event.preventDefault();
+      const year = document.getElementById('yearInput').value;
+      fetch("/start", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: "year=" + encodeURIComponent(year)
+      }).then(res => {
+        if (res.ok) {
+          alert("Zeitmaschine gestartet!");
+        } else {
+          alert("Fehler beim Start");
+        }
+      });
+    }
+  </script>
 </body>
 </html>

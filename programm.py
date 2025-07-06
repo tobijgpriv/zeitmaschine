@@ -37,6 +37,7 @@ def zeitanzeige():
     
 @app.route("/reset", methods=["POST"])
 def reset():
+    standardbeleuchtung()
     global current_target_year
     with year_lock:
         current_target_year = None
@@ -48,7 +49,7 @@ def index():
 
 @app.route("/stop", methods=["POST"])
 def stop():
-    standardbeleuchtung()  # <-- Diese Funktion wird am Ende aufgerufen
+    standardbeleuchtung()  
     return jsonify({"status": "ok"})
 
 

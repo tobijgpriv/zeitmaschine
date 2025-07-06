@@ -8,15 +8,15 @@ logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S',
 
 
 
-def turn_switch_wrapper(code,state,protocol):
+def turn_switch_wrapper(code,protocol):
     repeat=10
     pulselength=350
     gpio=17
     length=24
-    turn_switch(state,repeat,pulselength,length,protocol,gpio,code)
+    turn_switch(repeat,pulselength,length,protocol,gpio,code)
 
 
-def turn_switch(state,repeat,pulselength,length,protocol,gpio,code):
+def turn_switch(repeat,pulselength,length,protocol,gpio,code):
     
     
     rfdevice = RFDevice(gpio)
@@ -40,6 +40,15 @@ def strob(state):
 
     turn_switch_wrapper(code,state,1)
 
+def drehlicht(state):
+    if state == 1: 
+        code=5755988
+    else:
+        code=5755985
+
+    turn_switch_wrapper(code,2)
+
 strob(0)
+drehlicht(1)
 
 #test

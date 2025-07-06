@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 current_target_year = None
 current_duration=20
+current_running = False
 year_lock = Lock()
 
 
@@ -20,6 +21,8 @@ def zeitmaschine():
     with year_lock:
         global current_target_year 
         global current_duration
+        global current_running
+        current_running = True
         current_target_year = int(year)
         try:
             current_duration = int(duration)
@@ -32,7 +35,7 @@ def zeitmaschine():
 def status():
     with year_lock:
         if current_target_year is not None:
-            return jsonify({"start": True, "year": current_target_year, "duration": current_duration})
+            return jsonify({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running})
         else:
             return jsonify({"start": False})
 
@@ -43,6 +46,8 @@ def zeitanzeige():
 @app.route("/reset", methods=["POST"])
 def reset():
     standardbeleuchtung()
+    global current_running
+    current_running = False
     global current_target_year
     with year_lock:
         current_target_year = None

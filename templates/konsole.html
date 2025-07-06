@@ -87,7 +87,12 @@
         .then(data => {
           const box = document.getElementById("statusBox");
           if (data.start) {
-            box.textContent = `🚀 Aktiv – Zieljahr: ${data.year}`;
+            if (data.running) {
+                box.textContent = `🚀 Aktiv – Zieljahr: ${data.year}`;
+            }else{
+                box.textContent = `🚀 Angekommen – Zieljahr: ${data.year}`;
+            }
+            
           } else {
             box.textContent = "🕒 Wartend – Keine Zeitreise aktiv";
           }

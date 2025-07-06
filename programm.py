@@ -1,4 +1,4 @@
-from zeitmaschine import drei,vier,strob,drehlicht,zeitreise
+from zeitmaschine import drei,vier,strob,drehlicht,zeitreise,standardbeleuchtung
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -15,6 +15,11 @@ def zeitmaschine():
 @app.route('/')
 def index():
     return render_template('konsole.html')
+
+@app.route("/stop", methods=["POST"])
+def stop_route():
+    standardbeleuchtung()  # <-- Diese Funktion wird am Ende aufgerufen
+    return jsonify({"status": "stopped"})
 
 
 

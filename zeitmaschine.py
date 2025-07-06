@@ -86,3 +86,9 @@ def zeitreise():
     drehlicht(1)
     drei(1)
     vier(1)
+
+def standardbeleuchtung():
+    strob(1)
+    drehlicht(0)
+    drei(0)
+    vier(0)

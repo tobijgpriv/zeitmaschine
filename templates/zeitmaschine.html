@@ -116,6 +116,17 @@
         if (progress >= 1) {
           clearInterval(intervalId);
           yearDisplay.textContent = targetYear;
+          fetch("/stop", {
+            method: "POST"
+            }).then(response => {
+              if (response.ok) {
+                console.log("Stop-Signal erfolgreich gesendet");
+              } else {
+                console.error("Fehler beim Stop-Signal");
+              }
+            }).catch(error => {
+            console.error("Netzwerkfehler beim Stop-Signal:", error);
+            });
         }
       }, displayInterval);
     }

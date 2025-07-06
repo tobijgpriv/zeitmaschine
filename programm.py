@@ -4,7 +4,7 @@ from flask import Flask, render_template, request
 app = Flask(__name__)
 
 @app.route('/zeitmaschine', methods=["POST"])
-def index():
+def zeitmaschine():
     #year = request.form.get("year")
     if request.method == 'POST':
         year = request.form['year']

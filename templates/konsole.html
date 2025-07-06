@@ -52,15 +52,25 @@
       border: 2px solid #b08c4f;
       border-radius: 10px;
     }
+    form label {
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+      margin-right: 0.3em;
+    }
+
   </style>
 </head>
 <body>
   <div class="panel">
     <h1>Zeitmaschine steuern</h1>
     <form onsubmit="startTime(event)">
+      <label for="yearInput">Zieljahr:</label>
       <input type="number" name="year" id="yearInput" placeholder="Zieljahr">
-      <input type="number" name="duration" id="durationInput" min="5" max="120" value="20" placeholder="Dauer (Sek)">
-      <br>
+        
+      <label for="durationInput" style="margin-left: 1em;">Dauer (Sekunden):</label>
+      <input type="number" name="duration" id="durationInput" min="5" max="120" value="20" placeholder="Dauer">
+        
+      <br><br>
       <button type="submit">Start</button>
       <button type="button" onclick="resetMachine()">Reset</button>
     </form>

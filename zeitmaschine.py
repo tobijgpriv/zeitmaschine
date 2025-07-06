@@ -80,7 +80,3 @@ def alles_an():
     drehlicht(1)
     drei(1)
     vier(1)
-
-alles_an() 
-
-#test

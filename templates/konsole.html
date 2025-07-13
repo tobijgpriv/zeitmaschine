@@ -111,6 +111,46 @@
       document.getElementById("message").textContent = "Fehler: " + err.message;
     }
   }
+  async function startTravel() {
+    const actualYear = document.getElementById("actualYear").value;
+    const targetYear = document.getElementById("targetYear").value;
+    const hours = parseInt(document.getElementById("durationHours").value) || 0;
+    const minutes = parseInt(document.getElementById("durationMinutes").value) || 0;
+    const durationInSeconds = (hours * 60 + minutes) * 60;
+
+    try {
+      // Aktuelles Jahr setzen
+      const res1 = await fetch("/set_actual_year", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `year=${encodeURIComponent(actualYear)}`
+      });
+      if (!res1.ok) throw new Error("Fehler beim Setzen des aktuellen Jahres");
+
+      // Dauer separat speichern (damit Restzeit korrekt erscheint)
+      const res3 = await fetch("/set_duration", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `duration=${encodeURIComponent(durationInSeconds)}`
+      });
+      if (!res3.ok) throw new Error("Fehler beim Setzen der Dauer");
+
+      // Zieljahr & Dauer setzen (ohne Starten!)
+      const res2 = await fetch("/start", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `year=${encodeURIComponent(targetYear)}&duration=${encodeURIComponent(durationInSeconds)}`
+        //body: `year=${encodeURIComponent(targetYear)}&duration=${encodeURIComponent(5)}`
+      });
+      if (!res2.ok) throw new Error("Fehler beim Setzen des Zieljahres");
+
+      
+
+      document.getElementById("message").textContent = "Jahre und Dauer gespeichert.";
+    } catch (err) {
+      document.getElementById("message").textContent = "Fehler: " + err.message;
+    }
+  }
 </script>
 
 </body>

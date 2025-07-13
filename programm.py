@@ -86,7 +86,7 @@ class ZeitmaschinenController:
                 "actual": self.actual_year,
                 "year": self.target_year,
                 "duration": self.duration,
-                "start": self.state in [ZeitmaschinenStatus.INITIALISIERT, ZeitmaschinenStatus.LAUFEND],
+                "start": self.state in [ZeitmaschinenStatus.LAUFEND],
                 "running": self.state == ZeitmaschinenStatus.LAUFEND
             }
 

@@ -1,6 +1,13 @@
 from zeitmaschine import zeitreise,standardbeleuchtung
 from flask import Flask, render_template, request,jsonify
 from threading import Lock
+import logging
+
+from rotary import Rotary
+
+pin_dt = 23
+pin_clk = 18
+pin_sw = 24
 
 #Start Task runOnPi with Strg+Alt+r
 app = Flask(__name__)
@@ -71,3 +78,8 @@ def stop():
 if __name__ == "__main__":
     #app.run(debug=True)
     app.run(host="0.0.0.0")
+
+
+    rotary = Rotary(pin_dt, pin_clk, pin_sw)
+    value = 0
+    logging.error(value)

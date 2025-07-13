@@ -181,6 +181,10 @@ async function pollStatus() {
       startTimeMachine(actualYear, targetYear, duration * 1000);
     }
 
+    if (data.state == 'abgebrochen') {
+      state = STATES.STANDBY
+    }
+
     // Nur im Standby Status UI aktualisieren
     if (state === STATES.STANDBY) {
       currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(actualYear);

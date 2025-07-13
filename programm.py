@@ -72,6 +72,7 @@ def set_duration():
 def status():
     with year_lock:
         if current_target_year is not None:
+            logging.error(jsonify({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year}))
             return jsonify({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
         else:
             return jsonify({"start": False})

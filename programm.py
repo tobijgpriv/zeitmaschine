@@ -16,7 +16,7 @@ button = Button(pin_sw)
 app = Flask(__name__)
 
 current_actual_year = 2025
-current_target_year = None
+current_target_year = 2025
 current_started = False
 current_duration=20
 current_running = False

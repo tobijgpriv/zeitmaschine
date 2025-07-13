@@ -91,6 +91,104 @@
     </div>
   </div>
 
+<script>
+    const STATES = {
+  STANDBY: "standby",
+  RUNNING: "running",
+  FINISHED: "finished",
+  ERROR: "error"
+};
+
+let state = STATES.STANDBY;
+let intervalId = null;
+
+// DOM Elemente
+const currentYearDisplay = document.getElementById('currentYearDisplay');
+const targetYearDisplay = document.getElementById('targetYearDisplay');
+const countdownDisplay = document.getElementById('countdownDisplay');
+const energyBar = document.getElementById('energyBar');
+
+function setState(newState) {
+  console.log("Wechsle Zustand:", newState);
+  state = newState;
+}
+
+function formatYear(year) {
+  return year < 0 ? Math.abs(year) + " v. Chr." : year.toString();
+}
+
+function startTimeMachine(startYear, endYear, durationMs) {
+  setState(STATES.RUNNING);
+  const startTime = Date.now();
+
+  intervalId = setInterval(() => {
+    const now = Date.now();
+    const elapsed = now - startTime;
+    const progress = Math.min(Math.max(elapsed / durationMs, 0), 1);
+
+    // Fortschrittsbalken aktualisieren
+    energyBar.style.width = `${progress * 100}%`;
+
+    // Countdown anzeigen
+    const remaining = Math.ceil((durationMs - elapsed) / 1000);
+    const sec = remaining % 60;
+    const min = Math.floor(remaining / 60) % 60;
+    const h = Math.floor(remaining / 3600);
+    countdownDisplay.textContent = `Restzeit: ${h}h ${min}min ${sec}s`;
+
+    // Interpoliertes Jahr anzeigen
+    const interpolatedYear = Math.round(startYear + (endYear - startYear) * progress);
+    currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(interpolatedYear);
+    targetYearDisplay.textContent = "Zieljahr: " + formatYear(endYear);
+
+    if (progress >= 1) {
+      clearInterval(intervalId);
+      energyBar.style.width = "100%";
+      countdownDisplay.textContent = "Ankunft erreicht!";
+      setState(STATES.FINISHED);
+      fetch("/stop", { method: "POST" });
+    }
+  }, 100);
+}
+
+async function pollStatus() {
+  try {
+    const res = await fetch("/status");
+    const data = await res.json();
+
+    const actualYear = data.actual ?? 2025;
+    const targetYear = data.year ?? 2025;
+    const duration = data.duration ?? 20;
+
+    if (data.start && state === STATES.STANDBY) {
+      // Zeitreise starten
+      startTimeMachine(actualYear, targetYear, duration * 1000);
+    }
+
+    // Nur im Standby Status UI aktualisieren
+    if (state === STATES.STANDBY) {
+      currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(actualYear);
+      targetYearDisplay.textContent = "Zieljahr: " + formatYear(targetYear);
+
+      const totalSec = parseInt(duration);
+      const min = Math.floor(totalSec / 60) % 60;
+      const h = Math.floor(totalSec / 3600);
+      countdownDisplay.textContent = `Restzeit: ${h}h ${min}min`;
+    }
+
+  } catch (err) {
+    console.error("Status-Polling-Fehler:", err);
+    countdownDisplay.textContent = "Verbindung verloren...";
+    setState(STATES.ERROR);
+  }
+
+  setTimeout(pollStatus, 1000);
+}
+
+pollStatus();
+
+  </script>
+<!--
   <script>
     const currentYearDisplay = document.getElementById('currentYearDisplay');
     const targetYearDisplay = document.getElementById('targetYearDisplay');
@@ -130,6 +228,7 @@
         if (progress >= 1) {
           clearInterval(intervalId);
           fetch("/stop", { method: "POST" });
+          started = false;
         }
       }, 100);
     }
@@ -173,5 +272,6 @@
 
     pollStatus();
   </script>
+-->
 </body>
 </html>

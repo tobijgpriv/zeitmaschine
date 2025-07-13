@@ -173,7 +173,7 @@ async function pollStatus() {
 );
   targetYearDisplay.textContent = "Zieljahr: " + formatYear(data.year || 2025);
 
-  if (data.duration !== undefined) {
+  if ('duration' in data) {
     const totalSec = parseInt(data.duration);
     const min = Math.floor(totalSec / 60) % 60;
     const h = Math.floor(totalSec / 3600);

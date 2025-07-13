@@ -1,10 +1,12 @@
-from zeitmaschine import zeitreise,standardbeleuchtung
-from flask import Flask, render_template, request,jsonify
+from flask import Flask, render_template, request, jsonify
 from threading import Lock
 import logging
+from enum import Enum
 
+from zeitmaschine import zeitreise, standardbeleuchtung
 from gpiozero import RotaryEncoder, Button
 
+# GPIO Pins
 pin_dt = 23
 pin_clk = 18
 pin_sw = 24
@@ -12,127 +14,170 @@ pin_sw = 24
 encoder = RotaryEncoder(a=pin_clk, b=pin_dt, max_steps=0)
 button = Button(pin_sw)
 
-#Start Task runOnPi with Strg+Alt+r
 app = Flask(__name__)
+logging.basicConfig(level=logging.INFO)
 
-current_actual_year = 2025
-current_target_year = 2025
-current_started = False
-current_duration=43200
-current_running = False
-current_encoder_value = 0
-year_lock = Lock()
+# Zustände
+class ZeitmaschinenStatus(Enum):
+    IDLE = "idle"
+    INITIALISIERT = "initialisiert"
+    LAUFEND = "laufend"
+    BEENDET = "beendet"
+    ABGEBROCHEN = "abgebrochen"
 
+# State-Controller
+class ZeitmaschinenController:
+    def __init__(self):
+        self.actual_year = 2025
+        self.target_year = 2025
+        self.duration = 20
+        self.encoder_value = 0
+        self.state = ZeitmaschinenStatus.IDLE
+        self.lock = Lock()
+
+    def set_target_year(self, year):
+        with self.lock:
+            self.target_year = int(year)
+            self._update_state()
+
+    def set_actual_year(self, year):
+        with self.lock:
+            self.actual_year = int(year)
+
+    def set_duration(self, duration):
+        with self.lock:
+            self.duration = int(duration)
+            self._update_state()
+
+    def start(self):
+        with self.lock:
+            if self.duration > 0:
+                self.state = ZeitmaschinenStatus.LAUFEND
+                zeitreise()
+            else:
+                self.state = ZeitmaschinenStatus.IDLE
+
+    def stop(self):
+        with self.lock:
+            if self.state == ZeitmaschinenStatus.LAUFEND:
+                self.state = ZeitmaschinenStatus.ABGEBROCHEN
+                standardbeleuchtung()
+
+    def reset(self):
+        with self.lock:
+            self.__init__()
+            standardbeleuchtung()
+
+    def restart(self):
+        with self.lock:
+            self.state = ZeitmaschinenStatus.LAUFEND
+            zeitreise()
+
+    def _update_state(self):
+        if self.duration > 0 and self.target_year != self.actual_year:
+            self.state = ZeitmaschinenStatus.INITIALISIERT
+        else:
+            self.state = ZeitmaschinenStatus.IDLE
+
+    def get_status(self):
+        with self.lock:
+            return {
+                "state": self.state.value,
+                "actual": self.actual_year,
+                "year": self.target_year,
+                "duration": self.duration,
+                "start": self.state in [ZeitmaschinenStatus.INITIALISIERT, ZeitmaschinenStatus.LAUFEND],
+                "running": self.state == ZeitmaschinenStatus.LAUFEND
+            }
+
+controller = ZeitmaschinenController()
+
+# Rotary Encoder Steuerung
 def on_rotate():
-    global current_encoder_value
-    current_encoder_value = encoder.steps*10
-    current_target_year = 2025 + current_encoder_value
-    logging.error(f"Counter value: {current_target_year}")
+    controller.encoder_value = encoder.steps * 10
+    new_target = 2025 + controller.encoder_value
+    controller.set_target_year(new_target)
+    logging.info(f"Zieljahr geändert: {new_target}")
 
 def on_press():
-    global current_encoder_value
-    current_encoder_value = 0
+    controller.encoder_value = 0
     encoder.steps = 0
-    logging.error("Counter reset to 0")
+    controller.set_target_year(2025)
+    logging.info("Zieljahr zurückgesetzt")
 
 encoder.when_rotated = on_rotate
 button.when_pressed = on_press
 
-@app.route('/start', methods=["POST"])
-def zeitmaschine():
-    if request.method == 'POST':
-        year = request.form['year']
-        duration = request.form['duration']
-    if duration!=0:
-        zeitreise()
-    if not year or not year.lstrip("-").isdigit():
-        return "Ungültige Eingabe", 400
-    with year_lock:
-        global current_target_year 
-        global current_duration
-        global current_running
-        global current_started
-        current_started = True
-        current_running = int(duration) > 0
-        current_target_year = int(year)
-        try:
-            current_duration = int(duration)
-        except (TypeError, ValueError):
-            current_duration = 20  # fallback
-    return "Zeitreise gestartet", 200
-    #return render_template('zeitmaschine.html', target_year=int(year))
-
-@app.route("/set_duration", methods=["POST"])
-def set_duration():
-    global current_duration
-    duration = request.form.get("duration")
-    try:
-        current_duration = int(duration)
-        return "Dauer gesetzt", 200
-    except (TypeError, ValueError):
-        return "Ungültige Dauer", 400
-    
-@app.route("/status")
-def status():
-    with year_lock:
-        if current_started:
-            logging.error({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
-            return jsonify({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
-        else:
-            logging.error({"start": False, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
-            return jsonify({"start": False, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
+# Routen
+@app.route("/")
+def index():
+    return render_template("konsole.html")
 
 @app.route("/anzeige")
 def zeitanzeige():
     standardbeleuchtung()
-    return render_template("zeitmaschine.html")  
+    return render_template("zeitmaschine.html")
 
-@app.route("/set_actual_year", methods=["POST"])
-def set_actual_year():
-    global current_actual_year
+@app.route("/status")
+def status():
+    status_info = controller.get_status()
+    logging.info(f"Status abgefragt: {status_info}")
+    return jsonify(status_info)
+
+@app.route("/start", methods=["POST"])
+def start():
     year = request.form.get("year")
+    duration = request.form.get("duration")
     if not year or not year.lstrip("-").isdigit():
         return "Ungültiges Jahr", 400
-    current_actual_year = int(year)
-    return "Aktuelles Jahr gesetzt", 200    
-
-@app.route("/set_target_year", methods=["POST"])
-def set_target_year():
-    global current_target_year
-    year = request.form.get("year")
-    if not year or not year.lstrip("-").isdigit():
-        return "Ungültiges Jahr", 400
-    current_target_year = int(year)
-    return "Aktuelles Jahr gesetzt", 200 
-    
-@app.route("/reset", methods=["POST"])
-def reset():
-    standardbeleuchtung()
-    global current_running
-    current_running = False
-    global current_target_year
-    with year_lock:
-        current_target_year = None
-    return "Reset OK", 200
-
-@app.route('/')
-def index():
-    return render_template('konsole.html')
+    try:
+        controller.set_target_year(year)
+        controller.set_duration(duration)
+        controller.start()
+        return "Zeitreise gestartet", 200
+    except ValueError:
+        return "Ungültige Dauer", 400
 
 @app.route("/stop", methods=["POST"])
 def stop():
-    global current_running
-    current_running = False
-    standardbeleuchtung()  
-    return jsonify({"status": "ok"})
+    controller.stop()
+    return jsonify({"status": "Zeitreise abgebrochen"})
 
+@app.route("/reset", methods=["POST"])
+def reset():
+    controller.reset()
+    return "Reset OK", 200
 
+@app.route("/restart", methods=["POST"])
+def restart():
+    controller.restart()
+    return "Zeitreise neu gestartet", 200
 
+@app.route("/set_actual_year", methods=["POST"])
+def set_actual_year():
+    year = request.form.get("year")
+    if not year or not year.lstrip("-").isdigit():
+        return "Ungültiges Jahr", 400
+    controller.set_actual_year(year)
+    return "Aktuelles Jahr gesetzt", 200
+
+@app.route("/set_target_year", methods=["POST"])
+def set_target_year():
+    year = request.form.get("year")
+    if not year or not year.lstrip("-").isdigit():
+        return "Ungültiges Jahr", 400
+    controller.set_target_year(year)
+    return "Zieljahr gesetzt", 200
+
+@app.route("/set_duration", methods=["POST"])
+def set_duration():
+    duration = request.form.get("duration")
+    try:
+        controller.set_duration(duration)
+        return "Dauer gesetzt", 200
+    except ValueError:
+        return "Ungültige Dauer", 400
+
+# Hauptfunktion
 if __name__ == "__main__":
-    #app.run(debug=True)
-    app.run(host="0.0.0.0")
-
-
-    rotary = Rotary(pin_dt, pin_clk, pin_sw)
-    value = 0
-    logging.error(value)
+    app.run(host="0.0.0.0", debug=False)

@@ -160,7 +160,7 @@ function startTimeMachine(startYear, endYear, durationMs) {
     if (progress >= 1) {
       clearInterval(intervalId);
       energyBar.style.width = "100%";
-      countdownDisplay.textContent = "Ankunft erreicht!";
+      countdownDisplay.textContent = "Ziel erreicht!";
       setState(STATES.FINISHED);
       fetch("/stop", { method: "POST" });
     }

@@ -16,7 +16,7 @@ button = Button(pin_sw)
 app = Flask(__name__)
 
 current_actual_year = 2025
-current_target_year = 2025
+current_target_year = None
 current_duration=20
 current_running = False
 current_encoder_value = 0
@@ -39,10 +39,11 @@ button.when_pressed = on_press
 
 @app.route('/start', methods=["POST"])
 def zeitmaschine():
-    zeitreise()
     if request.method == 'POST':
         year = request.form['year']
         duration = request.form['duration']
+    if duration!=0:
+        zeitreise()
     if not year or not year.lstrip("-").isdigit():
         return "Ungültige Eingabe", 400
     with year_lock:
@@ -75,7 +76,7 @@ def status():
             logging.error({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
             return jsonify({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
         else:
-            return jsonify({"start": False})
+            return jsonify({"start": False, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
 
 @app.route("/anzeige")
 def zeitanzeige():

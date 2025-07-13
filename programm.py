@@ -3,11 +3,14 @@ from flask import Flask, render_template, request,jsonify
 from threading import Lock
 import logging
 
-from rotary import Rotary
+from gpiozero import RotaryEncoder, Button
 
 pin_dt = 23
 pin_clk = 18
 pin_sw = 24
+
+encoder = RotaryEncoder(pin_clk=18, pin_dt=23, max_steps=0)
+button = Button(24)
 
 #Start Task runOnPi with Strg+Alt+r
 app = Flask(__name__)
@@ -15,8 +18,22 @@ app = Flask(__name__)
 current_target_year = None
 current_duration=20
 current_running = False
+current_encoder_value = 0
 year_lock = Lock()
 
+def on_rotate():
+    global current_encoder_value
+    current_encoder_value = encoder.steps
+    logging.error(f"Counter value: {current_encoder_value}")
+
+def on_press():
+    global current_encoder_value
+    current_encoder_value = 0
+    encoder.steps = 0
+    logging.error("Counter reset to 0")
+
+encoder.when_rotated = on_rotate
+button.when_pressed = on_press
 
 @app.route('/start', methods=["POST"])
 def zeitmaschine():

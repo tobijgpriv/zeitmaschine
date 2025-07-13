@@ -17,6 +17,7 @@ app = Flask(__name__)
 
 current_actual_year = 2025
 current_target_year = None
+current_started = False
 current_duration=20
 current_running = False
 current_encoder_value = 0
@@ -50,6 +51,8 @@ def zeitmaschine():
         global current_target_year 
         global current_duration
         global current_running
+        global current_started
+        current_started = True
         current_running = int(duration) > 0
         current_target_year = int(year)
         try:
@@ -72,7 +75,7 @@ def set_duration():
 @app.route("/status")
 def status():
     with year_lock:
-        if current_target_year is not None:
+        if current_started:
             logging.error({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
             return jsonify({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
         else:

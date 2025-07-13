@@ -9,8 +9,8 @@ pin_dt = 23
 pin_clk = 18
 pin_sw = 24
 
-encoder = RotaryEncoder(pin_clk=18, pin_dt=23, max_steps=0)
-button = Button(24)
+encoder = RotaryEncoder(a=pin_clk, b=pin_dt, max_steps=0)
+button = Button(pin_sw)
 
 #Start Task runOnPi with Strg+Alt+r
 app = Flask(__name__)

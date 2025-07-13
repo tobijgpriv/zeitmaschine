@@ -95,7 +95,7 @@ controller = ZeitmaschinenController()
 # Rotary Encoder Steuerung
 def on_rotate():
     controller.encoder_value = encoder.steps * 10
-    new_target = controller.target_year + controller.encoder_value
+    new_target = 2025 + controller.encoder_value
     controller.set_target_year(new_target)
     logging.info(f"Zieljahr geändert: {new_target}")
 

@@ -102,8 +102,8 @@ def on_rotate():
 def on_press():
     controller.encoder_value = 0
     encoder.steps = 0
-    controller.set_target_year(2025)
-    logging.info("Zieljahr zurückgesetzt")
+    controller.start()
+    logging.info("Zeitreise gestartet")
 
 encoder.when_rotated = on_rotate
 button.when_pressed = on_press

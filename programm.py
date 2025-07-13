@@ -49,7 +49,7 @@ def zeitmaschine():
         global current_target_year 
         global current_duration
         global current_running
-        current_running = True
+        current_running = int(duration) > 0
         current_target_year = int(year)
         try:
             current_duration = int(duration)
@@ -58,6 +58,16 @@ def zeitmaschine():
     return "Zeitreise gestartet", 200
     #return render_template('zeitmaschine.html', target_year=int(year))
 
+@app.route("/set_duration", methods=["POST"])
+def set_duration():
+    global current_duration
+    duration = request.form.get("duration")
+    try:
+        current_duration = int(duration)
+        return "Dauer gesetzt", 200
+    except (TypeError, ValueError):
+        return "Ungültige Dauer", 400
+    
 @app.route("/status")
 def status():
     with year_lock:

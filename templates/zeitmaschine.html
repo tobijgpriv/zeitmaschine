@@ -74,6 +74,11 @@
       font-size: 1.2em;
       color: #f0e6d2;
     }
+    #countdownDisplay {
+  font-size: 3em;
+  color: #f0e6d2;
+  margin-top: 20px;
+}
   </style>
 </head>
 <body>
@@ -81,13 +86,94 @@
     <h1>Chrono-Scanner Interface</h1>
     <div class="screen" id="currentYearDisplay">Aktuelles Jahr: ----</div>
     <div class="screen" id="targetYearDisplay">Zieljahr: ----</div>
+    <div class="screen" id="countdownDisplay">Restzeit: -- s</div>
     <div class="energy-container">
       <div class="energy-label">Energieanzeige</div>
       <div class="energy-bar" id="energyBar"></div>
     </div>
   </div>
 
-  <script>
+<script>
+  const currentYearDisplay = document.getElementById('currentYearDisplay');
+const targetYearDisplay = document.getElementById('targetYearDisplay');
+const countdownDisplay = document.getElementById('countdownDisplay');
+const energyBar = document.getElementById('energyBar');
+
+let started = false;
+
+function formatYear(year) {
+  if (year < 0) return Math.abs(year) + " v. Chr.";
+  return year.toString();
+}
+
+function startTimeMachine(startYear, endYear, durationMs) {
+  started = true;
+  const startTime = Date.now();
+  const durationSec = durationMs / 1000;
+
+  const intervalId = setInterval(() => {
+    const now = Date.now();
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / durationMs, 1);
+
+    // Countdown (in Sekunden, auf ganze Zahl gerundet)
+    const remaining = Math.ceil((durationMs - elapsed) / 1000);
+    const remainingMinutes = Math.floor(remaining / 60);
+    const remainingSeconds = remaining % 60;
+    const remainingHours = Math.floor(remainingMinutes / 60);
+    const remainingMinutesOnly = remainingMinutes % 60;
+      
+    countdownDisplay.textContent = `Restzeit: ${remainingHours}h ${remainingMinutesOnly}min`;
+
+
+    // Fortschrittsbalken
+    energyBar.style.width = `${progress * 100}%`;
+
+    // Jahr interpolieren
+    const interpolatedYear = Math.round(startYear + (endYear - startYear) * progress);
+    currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(interpolatedYear);
+
+    // Zieljahr bleibt konstant
+    targetYearDisplay.textContent = "Zieljahr: " + formatYear(endYear);
+
+    if (progress >= 1) {
+      clearInterval(intervalId);
+      fetch("/stop", { method: "POST" });
+    }
+  }, 100);
+}
+
+async function pollStatus() {
+  try {
+    const res = await fetch("/status");
+    const data = await res.json();
+
+    if (!started && data.start) {
+      const start = data.actual || 2025;
+      const end = data.year || 2025;
+      const duration = (data.duration || 20) * 1000;
+
+      startTimeMachine(start, end, duration);
+    } else if (!data.start && started) {
+      location.reload();
+    } else {
+      // Wenn keine Zeitreise läuft, trotzdem aktuellen Stand anzeigen
+      currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(data.actual || 2025);
+      targetYearDisplay.textContent = "Zieljahr: " + formatYear(data.year || 2025);
+      countdownDisplay.textContent = "Restzeit: -- s";
+    }
+  } catch (err) {
+    console.error("Status-Polling-Fehler:", err);
+  }
+
+  setTimeout(pollStatus, 1000);
+}
+
+pollStatus();
+
+</script>
+
+<!--  <script>
   const energyBar = document.getElementById('energyBar');
   let targetYear = null;
   let started = false;
@@ -144,6 +230,7 @@
   // Initialer Start
   pollStatus();
 </script>
+-->
 <!--
   <script>
     const yearDisplay = document.getElementById('yearDisplay');

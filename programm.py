@@ -15,6 +15,7 @@ button = Button(pin_sw)
 #Start Task runOnPi with Strg+Alt+r
 app = Flask(__name__)
 
+current_actual_year = 2025
 current_target_year = 2025
 current_duration=20
 current_running = False
@@ -61,14 +62,23 @@ def zeitmaschine():
 def status():
     with year_lock:
         if current_target_year is not None:
-            return jsonify({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running})
+            return jsonify({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
         else:
             return jsonify({"start": False})
 
 @app.route("/anzeige")
 def zeitanzeige():
     standardbeleuchtung()
-    return render_template("zeitmaschine.html")      
+    return render_template("zeitmaschine.html")  
+
+@app.route("/set_actual_year", methods=["POST"])
+def set_actual_year():
+    global current_actual_year
+    year = request.form.get("year")
+    if not year or not year.lstrip("-").isdigit():
+        return "Ungültiges Jahr", 400
+    current_actual_year = int(year)
+    return "Aktuelles Jahr gesetzt", 200    
     
 @app.route("/reset", methods=["POST"])
 def reset():

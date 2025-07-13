@@ -50,19 +50,6 @@
       padding-left: calc((100% - 14ch) / 2);  /* Manuelles Zentrieren */
       box-sizing: content-box;
     }
-    /* Schrift zentriert
-    
-    .screen {
-      font-size: 12em;
-      color: #d4af37;
-      text-shadow: 0 0 20px #f0c674;
-      font-family: monospace;
-      text-align: center;
-      white-space: nowrap;
-      width: 12em; 
-      overflow: hidden;
-    }
-    */
 
     .energy-container {
       width: 80%;
@@ -94,7 +81,8 @@
 <body>
   <div class="frame">
     <h1>Chrono-Scanner Interface</h1>
-    <div class="screen" id="yearDisplay">----</div>
+    <div class="screen" id="currentYearDisplay">Aktuelles Jahr: ----</div>
+    <div class="screen" id="targetYearDisplay">Zieljahr: ----</div>
     <div class="energy-container">
       <div class="energy-label">Energieanzeige</div>
       <div class="energy-bar" id="energyBar"></div>
@@ -128,14 +116,13 @@
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
       energyBar.style.width = `${progress * 100}%`;
-      yearDisplay.textContent = formatYear(randomYear(-3000,2999));
+      targetYearDisplay.textContent = "Zieljahr: " + formatYear(randomYear(-3000, 2999));
       if (progress >= 1) {
         clearInterval(intervalId);
-        yearDisplay.textContent = formatYear(year);
+        targetYearDisplay.textContent = "Zieljahr: " + formatYear(year);
         fetch("/stop", { method: "POST" });
-        // Weiter beobachten ob reset kommt
       }
-    }, intervalMs);
+    }, 100);
   }
 
   async function pollStatus() {
@@ -143,19 +130,17 @@
       const res = await fetch("/status");
       const data = await res.json();
 
+      currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(data.actual || 2025);
+      targetYearDisplay.textContent = "Zieljahr: " + formatYear(data.year || 2025);
+
       if (!started && data.start) {
-        // Starte Zeitreise
-        targetYear = data.year;
-        const duration = (data.duration || 20) * 1000;
-        startTimeMachine(targetYear,duration);
+        startTimeMachine(data.year, (data.duration || 20) * 1000);
       } else if (started && !data.start) {
-        // Reset erkannt → Zurücksetzen der Anzeige
-        location.reload(); // Volles Zurücksetzen auf standby
+        location.reload();
       }
     } catch (err) {
       console.error("Status-Polling-Fehler:", err);
     }
-
     setTimeout(pollStatus, 2000);
   }
 

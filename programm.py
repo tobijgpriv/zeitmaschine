@@ -15,7 +15,7 @@ button = Button(pin_sw)
 #Start Task runOnPi with Strg+Alt+r
 app = Flask(__name__)
 
-current_target_year = None
+current_target_year = 2025
 current_duration=20
 current_running = False
 current_encoder_value = 0
@@ -23,8 +23,9 @@ year_lock = Lock()
 
 def on_rotate():
     global current_encoder_value
-    current_encoder_value = encoder.steps
-    logging.error(f"Counter value: {current_encoder_value}")
+    current_encoder_value = encoder.steps*10
+    current_target_year = 2025 + current_encoder_value
+    logging.error(f"Counter value: {current_target_year}")
 
 def on_press():
     global current_encoder_value

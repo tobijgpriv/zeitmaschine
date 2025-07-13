@@ -159,15 +159,18 @@ async function pollStatus() {
 
     if (!started && data.start) {
   // Starte Zeitreise
-  const start = data.actual || 2025;
+  const start = ('actual' in data ? data.actual : 2025)
+;
   const end = data.year || 2025;
-  const duration = (data.duration || 20) * 1000;
+  const duration = (('duration' in data ? data.duration : 20)
+) * 1000;
   startTimeMachine(start, end, duration);
 } else if (!data.start && started) {
   location.reload();
 } else {
   // ➕ Hier zeigen wir die Zahlen auch im Standby-Modus
-  currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(data.actual || 2025);
+  currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(('actual' in data ? data.actual : 2025)
+);
   targetYearDisplay.textContent = "Zieljahr: " + formatYear(data.year || 2025);
 
   if (data.duration !== undefined) {
@@ -191,64 +194,6 @@ pollStatus();
 
 </script>
 
-<!--  <script>
-  const energyBar = document.getElementById('energyBar');
-  let targetYear = null;
-  let started = false;
-  const duration = 20000;
-  const intervalMs = 100;
-
-  function randomYear(min = -3000, max = 2999) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  function formatYear(year) {
-  if (year < 0) {
-    return Math.abs(year) + " v. Chr.";
-  } else {
-    return year.toString();
-  }
-}
-
-  function startTimeMachine(year,duration) {
-    started = true;
-    const startTime = Date.now();
-    const intervalId = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      energyBar.style.width = `${progress * 100}%`;
-      targetYearDisplay.textContent = "Zieljahr: " + formatYear(randomYear(-3000, 2999));
-      if (progress >= 1) {
-        clearInterval(intervalId);
-        targetYearDisplay.textContent = "Zieljahr: " + formatYear(year);
-        fetch("/stop", { method: "POST" });
-      }
-    }, 100);
-  }
-
-  async function pollStatus() {
-    try {
-      const res = await fetch("/status");
-      const data = await res.json();
-
-      currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(data.actual || 2025);
-      targetYearDisplay.textContent = "Zieljahr: " + formatYear(data.year || 2025);
-
-      if (!started && data.start) {
-        startTimeMachine(data.year, (data.duration || 20) * 1000);
-      } else if (started && !data.start) {
-        location.reload();
-      }
-    } catch (err) {
-      console.error("Status-Polling-Fehler:", err);
-    }
-    setTimeout(pollStatus, 2000);
-  }
-
-  // Initialer Start
-  pollStatus();
-</script>
--->
 <!--
   <script>
     const yearDisplay = document.getElementById('yearDisplay');

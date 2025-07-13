@@ -95,6 +95,15 @@ def set_actual_year():
         return "Ungültiges Jahr", 400
     current_actual_year = int(year)
     return "Aktuelles Jahr gesetzt", 200    
+
+@app.route("/set_target_year", methods=["POST"])
+def set_target_year():
+    global current_target_year
+    year = request.form.get("year")
+    if not year or not year.lstrip("-").isdigit():
+        return "Ungültiges Jahr", 400
+    current_target_year = int(year)
+    return "Aktuelles Jahr gesetzt", 200 
     
 @app.route("/reset", methods=["POST"])
 def reset():

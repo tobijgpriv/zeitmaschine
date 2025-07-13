@@ -30,7 +30,7 @@ class ZeitmaschinenController:
     def __init__(self):
         self.actual_year = 2025
         self.target_year = 2025
-        self.duration = 20
+        self.duration = 43200
         self.encoder_value = 0
         self.state = ZeitmaschinenStatus.IDLE
         self.lock = Lock()

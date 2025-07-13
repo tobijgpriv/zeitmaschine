@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Zeitmaschinen-Konsole</title>
+  <style>
+    body {
+      background-color: #1a0f0a;
+      color: #f0e6d2;
+      font-family: monospace;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #d4af37;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+
+    input[type="number"] {
+      width: 200px;
+      padding: 5px;
+      font-size: 1em;
+      margin-top: 5px;
+      background-color: #3b2b1a;
+      color: #f0e6d2;
+      border: 1px solid #d4af37;
+    }
+
+    button {
+      margin-top: 30px;
+      padding: 10px 20px;
+      background-color: #d4af37;
+      color: #1a0f0a;
+      border: none;
+      cursor: pointer;
+      font-size: 1em;
+      margin-right: 15px;
+    }
+
+    button:hover {
+      background-color: #f0c674;
+    }
+
+    .message {
+      margin-top: 20px;
+      color: #f0e6d2;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1>Zeitmaschinen-Konsole</h1>
+
+  <label for="actualYear">Aktuelles Jahr:</label>
+  <input type="number" id="actualYear" value="2025">
+
+  <label for="targetYear">Zieljahr:</label>
+  <input type="number" id="targetYear" value="1985">
+
+  <label>Dauer:</label>
+    <input type="number" id="durationHours" value="0" style="width: 80px;"> h
+    <input type="number" id="durationMinutes" value="1" style="width: 80px;"> min
+
+  <div>
+    <button onclick="setYears()">Jahreszahlen speichern</button>
+    <button onclick="startTravel()">Zeitreise starten</button>
+  </div>
+
+  <div class="message" id="message"></div>
+
+<script>
+  async function setYears() {
+    const actualYear = document.getElementById("actualYear").value;
+    const targetYear = document.getElementById("targetYear").value;
+    const hours = parseInt(document.getElementById("durationHours").value) || 0;
+    const minutes = parseInt(document.getElementById("durationMinutes").value) || 0;
+    const durationInSeconds = (hours * 60 + minutes) * 60;
+
+    try {
+      // Aktuelles Jahr setzen
+      const res1 = await fetch("/set_actual_year", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `year=${encodeURIComponent(actualYear)}`
+      });
+      if (!res1.ok) throw new Error("Fehler beim Setzen des aktuellen Jahres");
+
+      // Zieljahr setzen
+      const res2 = await fetch("/set_target_year", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `year=${encodeURIComponent(targetYear)}`
+      });
+      if (!res1.ok) throw new Error("Fehler beim Setzen des Zieljahres");
+
+      // Dauer separat speichern (damit Restzeit korrekt erscheint)
+      const res3 = await fetch("/set_duration", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `duration=${encodeURIComponent(durationInSeconds)}`
+      });
+      if (!res3.ok) throw new Error("Fehler beim Setzen der Dauer");
+
+      document.getElementById("message").textContent = "Jahre und Dauer gespeichert.";
+    } catch (err) {
+      document.getElementById("message").textContent = "Fehler: " + err.message;
+    }
+  }
+  async function startTravel() {
+    const actualYear = document.getElementById("actualYear").value;
+    const targetYear = document.getElementById("targetYear").value;
+    const hours = parseInt(document.getElementById("durationHours").value) || 0;
+    const minutes = parseInt(document.getElementById("durationMinutes").value) || 0;
+    const durationInSeconds = (hours * 60 + minutes) * 60;
+
+    try {
+      // Aktuelles Jahr setzen
+      const res1 = await fetch("/set_actual_year", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `year=${encodeURIComponent(actualYear)}`
+      });
+      if (!res1.ok) throw new Error("Fehler beim Setzen des aktuellen Jahres");
+
+      // Dauer separat speichern (damit Restzeit korrekt erscheint)
+      const res3 = await fetch("/set_duration", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `duration=${encodeURIComponent(durationInSeconds)}`
+      });
+      if (!res3.ok) throw new Error("Fehler beim Setzen der Dauer");
+
+            // Zieljahr setzen
+      const res2 = await fetch("/set_target_year", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `year=${encodeURIComponent(targetYear)}`
+      });
+      if (!res1.ok) throw new Error("Fehler beim Setzen des Zieljahres");
+
+      // Zieljahr & Dauer setzen (ohne Starten!)
+      const res4 = await fetch("/start", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `year=${encodeURIComponent(targetYear)}&duration=${encodeURIComponent(durationInSeconds)}`
+        //body: `year=${encodeURIComponent(targetYear)}&duration=${encodeURIComponent(5)}`
+      });
+      if (!res2.ok) throw new Error("Fehler beim Setzen des Zieljahres");
+
+      
+
+      document.getElementById("message").textContent = "Jahre und Dauer gespeichert.";
+    } catch (err) {
+      document.getElementById("message").textContent = "Fehler: " + err.message;
+    }
+  }
+</script>
+
+</body>
+</html>

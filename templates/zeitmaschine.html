@@ -157,6 +157,11 @@ function startTimeMachine(startYear, endYear, durationMs) {
     currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(interpolatedYear);
     targetYearDisplay.textContent = "Zieljahr: " + formatYear(endYear);
 
+    if (state===STATES.STANDBY) {
+      clearInterval(intervalId);
+      energyBar.style.width = "100%";
+    }
+
     if (progress >= 1) {
       clearInterval(intervalId);
       energyBar.style.width = "100%";
@@ -182,7 +187,7 @@ async function pollStatus() {
     }
 
     if (data.state == 'abgebrochen') {
-      state = STATES.STANDBY
+      setState(STATES.STANDBY);
     }
 
     // Nur im Standby Status UI aktualisieren

@@ -63,6 +63,12 @@ class ZeitmaschinenController:
                 self.state = ZeitmaschinenStatus.ABGEBROCHEN
                 standardbeleuchtung()
 
+    def beendet(self):
+        with self.lock:
+            if self.state == ZeitmaschinenStatus.LAUFEND:
+                self.state = ZeitmaschinenStatus.BEENDET
+                standardbeleuchtung()
+
     def reset(self):
         with self.lock:
             self.__init__()
@@ -142,6 +148,11 @@ def start():
 def stop():
     controller.stop()
     return jsonify({"status": "Zeitreise abgebrochen"})
+
+@app.route("/beendet", methods=["POST"])
+def beendet():
+    controller.beendet()
+    return jsonify({"status": "Zeitreise beendet"})
 
 @app.route("/reset", methods=["POST"])
 def reset():

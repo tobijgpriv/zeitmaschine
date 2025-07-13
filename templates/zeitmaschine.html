@@ -167,7 +167,7 @@ function startTimeMachine(startYear, endYear, durationMs) {
       energyBar.style.width = "100%";
       countdownDisplay.textContent = "Ziel erreicht!";
       setState(STATES.FINISHED);
-      fetch("/stop", { method: "POST" });
+      fetch("/beendet", { method: "POST" });
     }
   }, 100);
 }

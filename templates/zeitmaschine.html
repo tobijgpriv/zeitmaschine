@@ -122,7 +122,7 @@ function startTimeMachine(startYear, endYear, durationMs) {
     const remainingSeconds = remaining % 60;
     const remainingHours = Math.floor(remainingMinutes / 60);
     const remainingMinutesOnly = remainingMinutes % 60;
-      
+
     countdownDisplay.textContent = `Restzeit: ${remainingHours}h ${remainingMinutesOnly}min`;
 
 
@@ -135,6 +135,15 @@ function startTimeMachine(startYear, endYear, durationMs) {
 
     // Zieljahr bleibt konstant
     targetYearDisplay.textContent = "Zieljahr: " + formatYear(endYear);
+
+    if (data.duration !== undefined) {
+  const totalSec = parseInt(data.duration);
+  const min = Math.floor(totalSec / 60) % 60;
+  const h = Math.floor(totalSec / 3600);
+  countdownDisplay.textContent = `Restzeit: ${h}h ${min}min`;
+} else {
+  countdownDisplay.textContent = "Restzeit: --";
+}
 
     if (progress >= 1) {
       clearInterval(intervalId);
@@ -149,19 +158,28 @@ async function pollStatus() {
     const data = await res.json();
 
     if (!started && data.start) {
-      const start = data.actual || 2025;
-      const end = data.year || 2025;
-      const duration = (data.duration || 20) * 1000;
+  // Starte Zeitreise
+  const start = data.actual || 2025;
+  const end = data.year || 2025;
+  const duration = (data.duration || 20) * 1000;
+  startTimeMachine(start, end, duration);
+} else if (!data.start && started) {
+  location.reload();
+} else {
+  // ➕ Hier zeigen wir die Zahlen auch im Standby-Modus
+  currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(data.actual || 2025);
+  targetYearDisplay.textContent = "Zieljahr: " + formatYear(data.year || 2025);
 
-      startTimeMachine(start, end, duration);
-    } else if (!data.start && started) {
-      location.reload();
-    } else {
-      // Wenn keine Zeitreise läuft, trotzdem aktuellen Stand anzeigen
-      currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(data.actual || 2025);
-      targetYearDisplay.textContent = "Zieljahr: " + formatYear(data.year || 2025);
-      countdownDisplay.textContent = "Restzeit: -- s";
-    }
+  if (data.duration !== undefined) {
+    const totalSec = parseInt(data.duration);
+    const min = Math.floor(totalSec / 60) % 60;
+    const h = Math.floor(totalSec / 3600);
+    countdownDisplay.textContent = `Restzeit: ${h}h ${min}min`;
+  } else {
+    countdownDisplay.textContent = "Restzeit: --";
+  }
+}
+
   } catch (err) {
     console.error("Status-Polling-Fehler:", err);
   }

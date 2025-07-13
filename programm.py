@@ -76,6 +76,7 @@ def status():
             logging.error({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
             return jsonify({"start": True, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
         else:
+            logging.error({"start": False, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
             return jsonify({"start": False, "year": current_target_year, "duration": current_duration, "running":current_running, "actual": current_actual_year})
 
 @app.route("/anzeige")

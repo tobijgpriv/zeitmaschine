@@ -107,6 +107,7 @@ class ZeitmaschinenController:
 controller = ZeitmaschinenController()
 
 def broadcast_status():
+    logging.info(controller.get_status())
     socketio.emit('status_update', controller.get_status())
 
 # Rotary Encoder Steuerung
@@ -183,7 +184,6 @@ def set_actual_year():
     if not year or not year.lstrip("-").isdigit():
         return "Ungültiges Jahr", 400
     controller.set_actual_year(year)
-    broadcast_status()
     return "Aktuelles Jahr gesetzt", 200
 
 @app.route("/set_target_year", methods=["POST"])
@@ -192,7 +192,6 @@ def set_target_year():
     if not year or not year.lstrip("-").isdigit():
         return "Ungültiges Jahr", 400
     controller.set_target_year(year)
-    broadcast_status()
     return "Zieljahr gesetzt", 200
 
 @app.route("/set_duration", methods=["POST"])
@@ -200,7 +199,6 @@ def set_duration():
     duration = request.form.get("duration")
     try:
         controller.set_duration(duration)
-        broadcast_status()
         return "Dauer gesetzt", 200
     except ValueError:
         return "Ungültige Dauer", 400

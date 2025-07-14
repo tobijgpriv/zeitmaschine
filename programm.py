@@ -148,6 +148,7 @@ def start():
         controller.set_target_year(year)
         controller.set_duration(duration)
         controller.start()
+        broadcast_status()
         return "Zeitreise gestartet", 200
     except ValueError:
         return "Ungültige Dauer", 400

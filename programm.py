@@ -199,4 +199,4 @@ def set_duration():
 # Hauptfunktion
 if __name__ == "__main__":
     #app.run(host="0.0.0.0", debug=False)
-    socketio.run(app, host="0.0.0.0", debug=True)
+    socketio.run(app, host="0.0.0.0", debug=False,allow_unsafe_werkzeug=True)

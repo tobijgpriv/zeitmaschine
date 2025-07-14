@@ -156,11 +156,13 @@ def start():
 @app.route("/stop", methods=["POST"])
 def stop():
     controller.stop()
+    broadcast_status()
     return jsonify({"status": "Zeitreise abgebrochen"})
 
 @app.route("/beendet", methods=["POST"])
 def beendet():
     controller.beendet()
+    broadcast_status()
     return jsonify({"status": "Zeitreise beendet"})
 
 @app.route("/reset", methods=["POST"])
@@ -171,6 +173,7 @@ def reset():
 @app.route("/restart", methods=["POST"])
 def restart():
     controller.restart()
+    broadcast_status()
     return "Zeitreise neu gestartet", 200
 
 @app.route("/set_actual_year", methods=["POST"])

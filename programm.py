@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from flask_socketio import SocketIO, emit
 from threading import Lock
 import logging
 from enum import Enum
@@ -15,6 +16,7 @@ encoder = RotaryEncoder(a=pin_clk, b=pin_dt, max_steps=0)
 button = Button(pin_sw)
 
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
 logging.basicConfig(level=logging.INFO)
 
 # Zustände
@@ -98,18 +100,23 @@ class ZeitmaschinenController:
 
 controller = ZeitmaschinenController()
 
+def broadcast_status():
+    socketio.emit('status_update', controller.get_status())
+
 # Rotary Encoder Steuerung
 def on_rotate():
     controller.encoder_value = encoder.steps * 10
     new_target = 2025 + controller.encoder_value
     controller.set_target_year(new_target)
     logging.info(f"Zieljahr geändert: {new_target}")
+    broadcast_status()
 
 def on_press():
     controller.encoder_value = 0
     encoder.steps = 0
     controller.start()
     logging.info("Zeitreise gestartet")
+    broadcast_status()
 
 encoder.when_rotated = on_rotate
 button.when_pressed = on_press
@@ -191,4 +198,5 @@ def set_duration():
 
 # Hauptfunktion
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=False)
+    #app.run(host="0.0.0.0", debug=False)
+    socketio.run(app, host="0.0.0.0", debug=False)

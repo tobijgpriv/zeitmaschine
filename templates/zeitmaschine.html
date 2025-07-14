@@ -94,6 +94,7 @@ h1 {
 }
 
   </style>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
   <div class="frame">
@@ -172,45 +173,35 @@ function startTimeMachine(startYear, endYear, durationMs) {
   }, 100);
 }
 
-async function pollStatus() {
-  try {
-    const res = await fetch("/status");
-    const data = await res.json();
+const socket = io();
 
-    const actualYear = data.actual ?? 2025;
-    const targetYear = data.year ?? 2025;
-    const duration = data.duration ?? 20;
+    socket.on("connect", () => {
+      console.log("WebSocket verbunden");
+    });
 
-    if (data.start && state === STATES.STANDBY) {
-      // Zeitreise starten
-      startTimeMachine(actualYear, targetYear, duration * 1000);
-    }
+    socket.on("status_update", (data) => {
+      const actualYear = data.actual ?? 2025;
+      const targetYear = data.year ?? 2025;
+      const duration = data.duration ?? 20;
 
-    if (data.state == 'abgebrochen') {
-      setState(STATES.STANDBY);
-    }
+      if (data.start && state === STATES.STANDBY) {
+        startTimeMachine(actualYear, targetYear, duration * 1000);
+      }
 
-    // Nur im Standby Status UI aktualisieren
-    if (state === STATES.STANDBY) {
-      currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(actualYear);
-      targetYearDisplay.textContent = "Zieljahr: " + formatYear(targetYear);
+      if (data.state === 'abgebrochen') {
+        setState(STATES.STANDBY);
+      }
 
-      const totalSec = parseInt(duration);
-      const min = Math.floor(totalSec / 60) % 60;
-      const h = Math.floor(totalSec / 3600);
-      countdownDisplay.textContent = `Restzeit: ${h}h ${min}min`;
-    }
+      if (state === STATES.STANDBY) {
+        currentYearDisplay.textContent = "Aktuelles Jahr: " + formatYear(actualYear);
+        targetYearDisplay.textContent = "Zieljahr: " + formatYear(targetYear);
 
-  } catch (err) {
-    console.error("Status-Polling-Fehler:", err);
-    countdownDisplay.textContent = "Verbindung verloren...";
-    setState(STATES.ERROR);
-  }
-
-  setTimeout(pollStatus, 1000);
-}
-
-pollStatus();
+        const totalSec = parseInt(duration);
+        const min = Math.floor(totalSec / 60) % 60;
+        const h = Math.floor(totalSec / 3600);
+        countdownDisplay.textContent = `Restzeit: ${h}h ${min}min`;
+      }
+    });
 
   </script>
 <!--

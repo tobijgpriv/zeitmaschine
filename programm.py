@@ -193,6 +193,7 @@ def set_duration():
     duration = request.form.get("duration")
     try:
         controller.set_duration(duration)
+        broadcast_status()
         return "Dauer gesetzt", 200
     except ValueError:
         return "Ungültige Dauer", 400

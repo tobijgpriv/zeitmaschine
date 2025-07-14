@@ -55,6 +55,7 @@ class ZeitmaschinenController:
         with self.lock:
             if self.duration > 0:
                 self.state = ZeitmaschinenStatus.LAUFEND
+                broadcast_status()
                 zeitreise()
             else:
                 self.state = ZeitmaschinenStatus.IDLE
@@ -63,12 +64,14 @@ class ZeitmaschinenController:
         with self.lock:
             if self.state == ZeitmaschinenStatus.LAUFEND:
                 self.state = ZeitmaschinenStatus.ABGEBROCHEN
+                broadcast_status()
                 standardbeleuchtung()
 
     def beendet(self):
         with self.lock:
             if self.state == ZeitmaschinenStatus.LAUFEND:
                 self.state = ZeitmaschinenStatus.BEENDET
+                broadcast_status()
                 standardbeleuchtung()
 
     def reset(self):
@@ -79,13 +82,16 @@ class ZeitmaschinenController:
     def restart(self):
         with self.lock:
             self.state = ZeitmaschinenStatus.LAUFEND
+            broadcast_status()
             zeitreise()
 
     def _update_state(self):
         if self.duration > 0 and self.target_year != self.actual_year:
             self.state = ZeitmaschinenStatus.INITIALISIERT
+            broadcast_status()
         else:
             self.state = ZeitmaschinenStatus.IDLE
+            broadcast_status()
 
     def get_status(self):
         with self.lock:

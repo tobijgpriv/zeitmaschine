@@ -124,10 +124,14 @@ def on_press():
     broadcast_status()
 
 def big_switch_on():
-    logging.info("Schalter ist AN (High)")
+    controller.start()
+    logging.info("Zeitreise gestartet")
+    broadcast_status()
 
 def big_switch_off():
-    logging.info("Schalter ist AUS (Low)")
+    controller.stop()
+    broadcast_status()
+    return jsonify({"status": "Zeitreise abgebrochen"})
 
 encoder.when_rotated = on_rotate
 button.when_pressed = on_press

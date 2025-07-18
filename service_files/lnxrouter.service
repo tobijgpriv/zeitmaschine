@@ -1,0 +1,14 @@
+[Unit]
+Description=Öffnet WLAN Hotspot 
+After=network.target
+
+[Service]
+Type=simple
+User=zeitmaschine
+ExecStart=/home/zeitmaschine/zeitmaschine/zeitmaschine_project/zeitmaschine/service_files/starte-lnxrouter.sh
+WorkingDirectory=/home/zeitmaschine/zeitmaschine/zeitmaschine_project/zeitmaschine/service_files
+Environment=HOME=/home/zeitmaschine/zeitmaschine/zeitmaschine_project/zeitmaschine/service_files
+RemainAfterExit=true
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=Starte Zeitmaschine, wenn WLAN Hotspot aktiv
+After=lnxrouter.service
+Requires=lnxrouter.service
+
+[Service]
+Type=simple
+User=zeitmaschine
+ExecStart=/home/zeitmaschine/zeitmaschine/zeitmaschine_project/zeitmaschine/service_files/starte-zeitmaschine.sh
+WorkingDirectory=/home/zeitmaschine/zeitmaschine/zeitmaschine_project/zeitmaschine/service_files
+Environment=HOME=/home/zeitmaschine/zeitmaschine/zeitmaschine_project/zeitmaschine/service_files
+RemainAfterExit=true
+
+[Install]
+WantedBy=default.target

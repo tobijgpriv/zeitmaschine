@@ -83,7 +83,7 @@
     <button onclick="setYears()">Jahreszahlen speichern</button>
     <button onclick="startTravel()">Zeitreise starten</button>
     <button onclick="stopTravel()">Zeitreise abbrechen</button>
-    <button onclick="restartTravel()">Zeitreise neustarten</button>
+    <button onclick="shutdown()">Zeitmaschine herunterfahren</button>
   </div>
 
   <div class="message" id="message"></div>
@@ -176,13 +176,13 @@
       }
     }
 
-    async function restartTravel() {
+    async function shutdown() {
       try {
-        const res = await fetch("/restart", { method: "POST" });
+        const res = await fetch("/shutdown", { method: "POST" });
         const text = await res.text();
-        document.getElementById("message").textContent = text || "Neustart ausgeführt.";
+        document.getElementById("message").textContent = text || "Zeitmaschine fährt herunter";
       } catch (err) {
-        document.getElementById("message").textContent = "Fehler beim Neustart.";
+        document.getElementById("message").textContent = "Fehler beim herunterfahren";
       }
     }
 

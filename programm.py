@@ -3,6 +3,8 @@ from flask_socketio import SocketIO, emit
 from threading import Lock
 import logging
 from enum import Enum
+import os
+import subprocess
 
 from zeitmaschine import zeitreise, standardbeleuchtung
 from gpiozero import RotaryEncoder, Button
@@ -216,8 +218,14 @@ def set_duration():
         return "Dauer gesetzt", 200
     except ValueError:
         return "Ungültige Dauer", 400
+    
+@app.route("/shutdown", methods=["POST"])
+def shutdown():
+    logging.info("System fährt jetzt herunter! Gute Nacht!")
+    subprocess.Popen(["sudo", "shutdown", "-h", "now"])
+    return "Zeitmaschine fährt herunter", 200
 
 # Hauptfunktion
 if __name__ == "__main__":
     #app.run(host="0.0.0.0", debug=False)
-    socketio.run(app, host="0.0.0.0", debug=False,allow_unsafe_werkzeug=True)
+    socketio.run(app, host="0.0.0.0",port=80, debug=False,allow_unsafe_werkzeug=True)

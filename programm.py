@@ -131,8 +131,8 @@ def big_switch_off():
 
 encoder.when_rotated = on_rotate
 button.when_pressed = on_press
-switch.when_pressed = big_switch_on
-switch.when_released = big_switch_off
+switch.when_pressed = big_switch_off
+switch.when_released = big_switch_on
 
 # Routen
 @app.route("/")

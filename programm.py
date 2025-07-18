@@ -7,6 +7,8 @@ from enum import Enum
 from zeitmaschine import zeitreise, standardbeleuchtung
 from gpiozero import RotaryEncoder, Button
 
+
+#Start Task runOnPi with Strg+Alt+r
 # GPIO Pins
 pin_dt = 23
 pin_clk = 18

@@ -13,9 +13,11 @@ from gpiozero import RotaryEncoder, Button
 pin_dt = 23
 pin_clk = 18
 pin_sw = 24
+pin_big_sw =22
 
 encoder = RotaryEncoder(a=pin_clk, b=pin_dt, max_steps=0)
 button = Button(pin_sw)
+switch = Button(pin_big_sw)
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -121,8 +123,16 @@ def on_press():
     logging.info("Zeitreise gestartet")
     broadcast_status()
 
+def big_switch_on():
+    print("Schalter ist AN (High)")
+
+def big_switch_off():
+    print("Schalter ist AUS (Low)")
+
 encoder.when_rotated = on_rotate
 button.when_pressed = on_press
+switch.when_pressed = big_switch_on
+switch.when_released = big_switch_off
 
 # Routen
 @app.route("/")

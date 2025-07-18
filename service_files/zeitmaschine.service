@@ -8,7 +8,8 @@ Type=simple
 User=zeitmaschine
 ExecStart=/home/zeitmaschine/zeitmaschine/zeitmaschine_project/zeitmaschine/service_files/starte-zeitmaschine.sh
 WorkingDirectory=/home/zeitmaschine/zeitmaschine/zeitmaschine_project/zeitmaschine/service_files
-Environment=HOME=/home/zeitmaschine/zeitmaschine/zeitmaschine_project/zeitmaschine/service_files
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/zeitmaschine/.Xauthority
 RemainAfterExit=true
 
 [Install]

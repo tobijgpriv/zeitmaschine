@@ -6,6 +6,6 @@ python3 /home/zeitmaschine/zeitmaschine/zeitmaschine_project/zeitmaschine/progra
 
 
 
-export DISPLAY=:0
+#export DISPLAY=:0
 
 firefox --kiosk "http://127.0.0.1:5000/anzeige"

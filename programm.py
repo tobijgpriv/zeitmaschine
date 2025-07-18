@@ -131,7 +131,6 @@ def big_switch_on():
 def big_switch_off():
     controller.stop()
     broadcast_status()
-    return jsonify({"status": "Zeitreise abgebrochen"})
 
 encoder.when_rotated = on_rotate
 button.when_pressed = on_press

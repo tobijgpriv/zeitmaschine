@@ -17,7 +17,7 @@ pin_big_sw =22
 
 encoder = RotaryEncoder(a=pin_clk, b=pin_dt, max_steps=0)
 button = Button(pin_sw)
-switch = Button(pin_big_sw,bounce_time=0.5)
+switch = Button(pin_big_sw,bounce_time=0.1)
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")

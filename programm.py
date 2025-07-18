@@ -124,10 +124,10 @@ def on_press():
     broadcast_status()
 
 def big_switch_on():
-    print("Schalter ist AN (High)")
+    logging.info("Schalter ist AN (High)")
 
 def big_switch_off():
-    print("Schalter ist AUS (Low)")
+    logging.info("Schalter ist AUS (Low)")
 
 encoder.when_rotated = on_rotate
 button.when_pressed = on_press
